@@ -2,54 +2,16 @@
 #include <stdlib.h>
 #include <time.h>
 #include <MLV/MLV_all.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
-typedef struct etage
+#include "types.h"
+#include "main.h"
+#include "socket.h"
+
+map map_vide()
 {
-    struct etage *gauche;
-    int *tab;
-    struct etage *droit;
-} etage;
-
-typedef etage *map;
-int elem = 0;
-MLV_Image *terre_herbe;
-MLV_Image *terre;
-MLV_Image *stone;
-MLV_Image *mario;
-MLV_Image *mario_jump;
-MLV_Image *bedrock;
-
-
-map actuel;
-int position = 1;
-int hauteur = 1;
-int tab[][10] = {{0, 0, 0, 0, 1, 2, 2},
-                {0, 0, 0, 1, 1, 2, 2},
-                {0, 0, 1, 1, 1, 2, 2},
-                {0, 0, 0, 1, 1, 2, 2},
-                {0, 0, 0, 0, 1, 2, 2},
-                {0, 0, 0, 0, 1, 2, 2},
-                {0, 0, 0, 1, 1, 2, 2},
-                {0, 0, 1, 1, 1, 2, 2},
-                {0, 0, 0, 1, 1, 2, 2},
-                {0, 0, 0, 0, 1, 2, 2},
-                {0, 0, 0, 0, 1, 2, 2},
-                {0, 0, 0, 1, 1, 2, 2},
-                {0, 0, 1, 1, 1, 2, 2},
-                {0, 0, 0, 1, 1, 2, 2},
-                {0, 0, 0, 0, 1, 2, 2},
-                {0, 0, 0, 0, 1, 2, 2},
-                {0, 0, 0, 1, 1, 2, 2},
-                {0, 0, 1, 1, 1, 2, 2},
-                {0, 0, 0, 1, 1, 2, 2},
-                {0, 0, 0, 0, 1, 2, 2},
-                {0, 0, 0, 0, 1, 2, 2},
-                {0, 0, 0, 1, 1, 2, 2},
-                {0, 0, 1, 1, 1, 2, 2},
-                {0, 0, 0, 1, 1, 2, 2},
-                {0, 0, 0, 0, 1, 2, 2}};
-
-map map_vide(){
     return NULL;
 }
 map nouvel_etage(map etage_gauche)
@@ -73,11 +35,14 @@ map nouvel_etage(map etage_gauche)
     et->tab[0] = 0;
     et->tab[1] = 0;
     et->tab[2] = 0;
-    if(elem%2 == 1){
+    if (elem % 2 == 1)
+    {
         et->tab[3] = 0;
-     }else{
+    }
+    else
+    {
         et->tab[3] = 1;
-     }
+    }
     et->tab[4] = 1;
     et->tab[5] = 1;
     et->tab[6] = 2;
@@ -90,7 +55,7 @@ map nouvel_etage(map etage_gauche)
 void init_tableau()
 {
     int i;
-    map premier = malloc(sizeof(etage));  // Allocate memory for premier
+    map premier = malloc(sizeof(etage)); // Allocate memory for premier
 
     if (!premier)
     {
@@ -98,7 +63,7 @@ void init_tableau()
         exit(EXIT_FAILURE);
     }
 
-    premier->tab = malloc(sizeof(int) * 10);  // Allocate memory for the tab inside premier
+    premier->tab = malloc(sizeof(int) * 10); // Allocate memory for the tab inside premier
 
     if (!premier->tab)
     {
@@ -112,11 +77,14 @@ void init_tableau()
     premier->tab[0] = 0;
     premier->tab[1] = 0;
     premier->tab[2] = 0;
-    if(elem%2 == 1){
+    if (elem % 2 == 1)
+    {
         premier->tab[3] = 0;
-     }else{
-        premier->tab[3] = 1;    
-     }    
+    }
+    else
+    {
+        premier->tab[3] = 1;
+    }
     premier->tab[4] = 1;
     premier->tab[5] = 1;
     premier->tab[6] = 2;
@@ -135,10 +103,9 @@ void init_tableau()
     actuel->gauche = premier;
 }
 
-
 void init_carte()
 {
- 
+
     actuel = malloc(sizeof(etage));
     if (!actuel)
     {
@@ -197,79 +164,117 @@ void afficher_carte()
             {
                 if (current->gauche->tab[j - 1] == 1)
                 {
-                    MLV_draw_image(terre, i * 50 , j * 50 );
+                    MLV_draw_image(terre, i * 50, j * 50);
                 }
                 else
                 {
-                    MLV_draw_image(terre_herbe, i * 50 , j * 50 );
+                    MLV_draw_image(terre_herbe, i * 50, j * 50);
                 }
             }
             else if (current->gauche->tab[j] == 2)
             {
-                MLV_draw_image(stone, i * 50 , j * 50 );
-            }else if( current->gauche->tab[j] == 3){
+                MLV_draw_image(stone, i * 50, j * 50);
+            }
+            else if (current->gauche->tab[j] == 3)
+            {
 
-                MLV_draw_image(bedrock, i * 50 , j * 50 );
+                MLV_draw_image(bedrock, i * 50, j * 50);
             }
             else
             {
-                MLV_draw_filled_rectangle(i * 50 , j * 50 , 50, 50, MLV_COLOR_BLUE);
+                MLV_draw_filled_rectangle(i * 50, j * 50, 50, 50, MLV_COLOR_BLUE);
             }
         }
         current = current->droit;
     }
-    MLV_draw_filled_rectangle(1 * 50 , hauteur * 50 , 50, 50, MLV_COLOR_GREEN);
-    MLV_draw_image(mario, 1 * 50 , hauteur * 50 );
+    MLV_draw_filled_rectangle(1 * 50, hauteur * 50, 50, 50, MLV_COLOR_GREEN);
+    MLV_draw_image(mario, 1 * 50, hauteur * 50);
 }
-void afficher_actuel(){
+void afficher_actuel()
+{
     int i;
-    for(i=0;i<10;i++){
-        printf("%d ",actuel->tab[i]);
+    for (i = 0; i < 10; i++)
+    {
+        printf("%d ", actuel->tab[i]);
     }
     printf("\n");
 }
-void actualise_deplacement(){
-            if (MLV_get_keyboard_state(MLV_KEYBOARD_SPACE) == MLV_PRESSED)
+void actualise_deplacement()
+{
+    if (MLV_get_keyboard_state(MLV_KEYBOARD_SPACE) == MLV_PRESSED)
+    {
+        hauteur--;
+    }
+    afficher_carte();
+    MLV_actualise_window();
+    MLV_wait_milliseconds(50);
+    if (MLV_get_keyboard_state(MLV_KEYBOARD_q) == MLV_PRESSED)
+    {
+        if (actuel->gauche->tab[hauteur] == 0)
         {
-            hauteur--;
+            printf("On va a gauche\n");
+            actuel = actuel->gauche;
         }
-        afficher_carte();
-        MLV_actualise_window();
-        MLV_wait_milliseconds(50);
-        if (MLV_get_keyboard_state(MLV_KEYBOARD_q) == MLV_PRESSED)
+    }
+    if (MLV_get_keyboard_state(MLV_KEYBOARD_d) == MLV_PRESSED)
+    {
+        if (actuel->droit->tab[hauteur] == 0)
         {
-            if (actuel->gauche->tab[hauteur] == 0)
-            {
-                printf("On va a gauche\n");
-                actuel = actuel->gauche;
-            }
+            printf("On va a droite\n");
+            actuel = actuel->droit;
         }
-        if (MLV_get_keyboard_state(MLV_KEYBOARD_d) == MLV_PRESSED)
-        {
-            if (actuel->droit->tab[hauteur] == 0)
-            {
-                printf("On va a droite\n");
-                actuel = actuel->droit;
-            }
-        }
-        afficher_carte();
-        MLV_actualise_window();
-        MLV_wait_milliseconds(100);
+    }
+    afficher_carte();
+    MLV_actualise_window();
+    MLV_wait_milliseconds(100);
 }
 
+void actualise_deplacement_friends(char message[500])
+{
+    printf("on traite");
+    printf("\"%s\"",message);
+    if (strstr(message,"z"))
+    {
+        hauteur--;
+    }
+    afficher_carte();
+    MLV_actualise_window();
+    MLV_wait_milliseconds(50);
+    if (strstr(message,"q"))
+    {
+        if (actuel->gauche->tab[hauteur] == 0)
+        {
+            printf("On va a gauche\n");
+            actuel = actuel->gauche;
+        }
+    }
+    if (strstr(message,"d"))
+    {
+        if (actuel->droit->tab[hauteur] == 0)
+        {
+            printf("On va a droite\n");
+            actuel = actuel->droit;
+        }
+    }
+    afficher_carte();
+    MLV_actualise_window();
+    MLV_wait_milliseconds(100);
+}
 int main()
 {
-    srand( time( NULL ) );
+    char deplacement_ext[500];
+    int server_socket = open_socket();
+    char *message;
+    srand(time(NULL));
     init_carte();
     init_tableau();
     MLV_actualise_window();
     actuel = actuel->gauche;
     while (1)
     {
-        actualise_deplacement();
-        
-
-
+        // actualise_deplacement();
+        message = wait_for_response(server_socket);
+        actualise_deplacement_friends(message);
         while (actuel->tab[hauteur + 1] == 0)
         {
             hauteur++;
@@ -278,6 +283,6 @@ int main()
         MLV_actualise_window();
         afficher_actuel();
         MLV_wait_milliseconds(50);
-    
+        free(message);
     }
 }

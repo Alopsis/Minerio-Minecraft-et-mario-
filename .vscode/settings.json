@@ -1,6 +1,12 @@
 {
     "files.associations": {
         "mlv_all.h": "c",
-        "types.h": "c"
+        "types.h": "c",
+        "stdio.h": "c",
+        "time.h": "c",
+        "stdlib.h": "c",
+        "in.h": "c",
+        "main.h": "c",
+        "socket.h": "c"
     }
 }
