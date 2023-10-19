@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "mlv_all.h": "c"
+        "mlv_all.h": "c",
+        "types.h": "c"
     }
 }

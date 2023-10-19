@@ -267,7 +267,7 @@ int main()
     while (1)
     {
         actualise_deplacement();
-
+        
 
 
         while (actuel->tab[hauteur + 1] == 0)
