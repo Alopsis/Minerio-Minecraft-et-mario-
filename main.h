@@ -8,8 +8,8 @@ MLV_Image *stone;
 MLV_Image *mario;
 MLV_Image *mario_jump;
 MLV_Image *bedrock;
-
-
+int menu = 0;
+int selection = 0;
 
 map actuel;
 int position = 1;

@@ -122,7 +122,7 @@ void init_carte()
 
     MLV_create_window("Mario", "Mario", 500, 500);
     MLV_clear_window(MLV_COLOR_WHITE);
-
+    MLV_change_frame_rate(14);
     terre = MLV_load_image("./images/minecraft_dirt_sans_herbe.png");
     terre_herbe = MLV_load_image("./images/minecraft_dirt.png");
     stone = MLV_load_image("./images/stone.png");
@@ -154,6 +154,29 @@ void afficher_carte()
         free(current);
         exit(EXIT_FAILURE);
     }
+
+    if (menu == 1)
+    {
+        if (MLV_get_frame_rate() != 15)
+        {
+            MLV_change_window_size(500, 600);
+
+            MLV_change_frame_rate(15);
+        }
+        MLV_draw_image(bedrock, 50, 500);
+        MLV_draw_image(terre, 100, 500);
+        MLV_draw_image(stone, 150, 500);
+        MLV_draw_rectangle(200 - 50*selection,500,51,51,MLV_COLOR_GREEN);
+    }
+    else
+    {
+        if (MLV_get_frame_rate() != 14)
+        {
+            MLV_change_window_size(500, 500);
+            MLV_change_frame_rate(14);
+        }
+    }
+
     current = actuel;
 
     for (i = 0; i < 10; i++)
@@ -187,6 +210,7 @@ void afficher_carte()
         }
         current = current->droit;
     }
+
     MLV_draw_filled_rectangle(1 * 50, hauteur * 50, 50, 50, MLV_COLOR_GREEN);
     MLV_draw_image(mario, 1 * 50, hauteur * 50);
 }
@@ -199,6 +223,7 @@ void afficher_actuel()
     }
     printf("\n");
 }
+
 void actualise_deplacement()
 {
     if (MLV_get_keyboard_state(MLV_KEYBOARD_SPACE) == MLV_PRESSED)
@@ -212,18 +237,53 @@ void actualise_deplacement()
     {
         if (actuel->gauche->tab[hauteur] == 0)
         {
-            printf("On va a gauche\n");
             actuel = actuel->gauche;
         }
+    }
+    if (MLV_get_keyboard_state(MLV_KEYBOARD_e) == MLV_PRESSED)
+    {
+        actuel->droit->tab[hauteur] = selection;
+    }
+    if (MLV_get_keyboard_state(MLV_KEYBOARD_r) == MLV_PRESSED)
+    {
+        menu = 1;
+    }
+    if (MLV_get_keyboard_state(MLV_KEYBOARD_t) == MLV_PRESSED)
+    {
+        menu = 0;
+    }
+    if (MLV_get_keyboard_state(MLV_KEYBOARD_a) == MLV_PRESSED)
+    {
+        actuel->gauche->tab[hauteur] = selection;
+    }
+    if (MLV_get_keyboard_state(MLV_KEYBOARD_w) == MLV_PRESSED)
+    {
+        actuel->gauche->tab[hauteur] = 0;
+    }
+    if (MLV_get_keyboard_state(MLV_KEYBOARD_c) == MLV_PRESSED)
+    {
+        actuel->droit->tab[hauteur] = 0;
     }
     if (MLV_get_keyboard_state(MLV_KEYBOARD_d) == MLV_PRESSED)
     {
         if (actuel->droit->tab[hauteur] == 0)
         {
-            printf("On va a droite\n");
             actuel = actuel->droit;
         }
     }
+
+        if (MLV_get_keyboard_state(MLV_KEYBOARD_i) == MLV_PRESSED)
+        {
+            selection = 1;
+        }
+        if (MLV_get_keyboard_state(MLV_KEYBOARD_o) == MLV_PRESSED)
+        {
+            selection = 2;
+        }
+        if (MLV_get_keyboard_state(MLV_KEYBOARD_p) == MLV_PRESSED)
+        {
+            selection = 3;
+        }
     afficher_carte();
     MLV_actualise_window();
     MLV_wait_milliseconds(100);
@@ -232,15 +292,15 @@ void actualise_deplacement()
 void actualise_deplacement_friends(char message[500])
 {
     printf("on traite");
-    printf("\"%s\"",message);
-    if (strstr(message,"z"))
+    printf("\"%s\"", message);
+    if (strstr(message, "z"))
     {
         hauteur--;
     }
     afficher_carte();
     MLV_actualise_window();
     MLV_wait_milliseconds(50);
-    if (strstr(message,"q"))
+    if (strstr(message, "q"))
     {
         if (actuel->gauche->tab[hauteur] == 0)
         {
@@ -248,7 +308,7 @@ void actualise_deplacement_friends(char message[500])
             actuel = actuel->gauche;
         }
     }
-    if (strstr(message,"d"))
+    if (strstr(message, "d"))
     {
         if (actuel->droit->tab[hauteur] == 0)
         {
@@ -263,7 +323,7 @@ void actualise_deplacement_friends(char message[500])
 int main()
 {
     char deplacement_ext[500];
-    int server_socket = open_socket();
+    // int server_socket = open_socket();
     char *message;
     srand(time(NULL));
     init_carte();
@@ -272,9 +332,10 @@ int main()
     actuel = actuel->gauche;
     while (1)
     {
-        // actualise_deplacement();
-        message = wait_for_response(server_socket);
-        actualise_deplacement_friends(message);
+        printf("selection = %d\n",selection);
+        actualise_deplacement();
+        // message = wait_for_response(server_socket);
+        // actualise_deplacement_friends(message);
         while (actuel->tab[hauteur + 1] == 0)
         {
             hauteur++;
@@ -283,6 +344,7 @@ int main()
         MLV_actualise_window();
         afficher_actuel();
         MLV_wait_milliseconds(50);
-        free(message);
+        MLV_clear_window(MLV_COLOR_BLACK);
+        // free(message);
     }
 }

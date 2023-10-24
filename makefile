@@ -10,3 +10,6 @@ main.o: main.c main.h
 
 socket.o: socket.c socket.h
 	$(CC) $(OPTIONS) -c socket.c
+ 
+clear: 
+	rm *.o main 
