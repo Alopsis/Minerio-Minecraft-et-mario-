@@ -1,6 +1,8 @@
 
 
-
+#define DIRT 1;
+#define STONE 2;
+#define BEDROCK 3;
 int elem = 0;
 MLV_Image *terre_herbe;
 MLV_Image *terre;
@@ -9,7 +11,7 @@ MLV_Image *mario;
 MLV_Image *mario_jump;
 MLV_Image *bedrock;
 int menu = 0;
-int selection = 0;
+int selection = 1;
 
 map actuel;
 int position = 1;

@@ -164,8 +164,8 @@ void afficher_carte()
             MLV_change_frame_rate(15);
         }
         MLV_draw_image(bedrock, 50, 500);
-        MLV_draw_image(terre, 100, 500);
-        MLV_draw_image(stone, 150, 500);
+        MLV_draw_image(stone, 100, 500);
+        MLV_draw_image(terre, 150, 500);
         MLV_draw_rectangle(200 - 50*selection,500,51,51,MLV_COLOR_GREEN);
     }
     else
@@ -274,15 +274,15 @@ void actualise_deplacement()
 
         if (MLV_get_keyboard_state(MLV_KEYBOARD_i) == MLV_PRESSED)
         {
-            selection = 1;
+            selection = BEDROCK;
         }
         if (MLV_get_keyboard_state(MLV_KEYBOARD_o) == MLV_PRESSED)
         {
-            selection = 2;
+            selection = STONE;
         }
         if (MLV_get_keyboard_state(MLV_KEYBOARD_p) == MLV_PRESSED)
         {
-            selection = 3;
+            selection = DIRT;
         }
     afficher_carte();
     MLV_actualise_window();
@@ -323,7 +323,7 @@ void actualise_deplacement_friends(char message[500])
 int main()
 {
     char deplacement_ext[500];
-    // int server_socket = open_socket();
+    int server_socket = open_socket();
     char *message;
     srand(time(NULL));
     init_carte();
@@ -334,8 +334,8 @@ int main()
     {
         printf("selection = %d\n",selection);
         actualise_deplacement();
-        // message = wait_for_response(server_socket);
-        // actualise_deplacement_friends(message);
+        //message = wait_for_response(server_socket);
+        //actualise_deplacement_friends(message);
         while (actuel->tab[hauteur + 1] == 0)
         {
             hauteur++;
